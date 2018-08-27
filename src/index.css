@@ -1,5 +1,48 @@
-body {
+body,
+#root,
+html {
   margin: 0;
   padding: 0;
+  height: 100%;
+  width: 100%;
   font-family: sans-serif;
+  background: #fafafa;
+}
+
+.center-wrapper {
+  display: table;
+}
+
+.full {
+  height: 100vh;
+  width: 100vw;
+}
+
+.center {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+* {
+  box-sizing: border-box;
+}
+a {
+  text-decoration: none;
+}
+.t-c {
+  text-align: center;
+}
+input,
+button,
+select {
+  outline: none;
+}
+
+button {
+  cursor: pointer !important;
+}
+input:active,
+input:focus,
+input:hover {
+  border-color: #fc5d51 !important;
 }
