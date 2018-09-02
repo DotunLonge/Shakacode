@@ -1,4 +1,4 @@
-const token = "token";
+const token = "authorization";
 
 export const retrieveToken = () => {
   const ls =
@@ -13,7 +13,7 @@ export const retrieveToken = () => {
   return ls || ss || undefined;
 };
 
-export const setToken = (type, tokenValue) => {
+export const saveToken = (type, tokenValue) => {
   if (type === "ss") {
     sessionStorage.setItem(token, tokenValue);
   } else {
