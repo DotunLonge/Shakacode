@@ -1,67 +1,75 @@
 import { authActions as actions } from "../actions/auth";
 import axios from "axios";
-import { setToken, clearToken } from "../../helpers/token";
+import { saveToken, retrieveToken, clearToken } from "../../helpers/token";
+import endpoints from "../../endpoints";
+import { extractMessage } from "../../helpers/others";
 
-export const signin = (obj, callback) => {
+export const signin = obj => {
   return dispatch => {
     dispatch({ type: actions.SIGNIN_IN_PROGRESS });
     axios({
-      url: process.env.REACT_APP_SIGNIN,
+      url: endpoints.SIGNIN,
       method: "POST",
       data: obj
     })
       .then(res => {
-        setToken("ls", res.data.jwtToken);
+        saveToken("ls", res.data.token);
         dispatch({
           type: actions.SIGNIN_SUCCESSFUL,
           data: res.data
         });
-        callback();
       })
       .catch(res => {
         dispatch({
           type: actions.SIGNIN_FAILED,
-          error: res.response.data.error
+          message: extractMessage(res)
         });
       });
   };
 };
 
-// export const auto_signin = () => {
-//   return dispatch => {
-//     dispatch({ type: actions.SIGN_IN_IN_PROGRESS });
-//     axios({
-//       url: process.env.REACT_APP_AUTO_SIGNIN,
-//       method: "GET",
-//       headers: {
-//         authorization: retrieveToken()
-//       }
-//     })
-//       .then(res => {
-//         dispatch({
-//           type: actions.SIGN_IN_SUCCESSFUL,
-//           data: res.data
-//         });
-//       })
-//       .catch(res => {
-//         dispatch({
-//           type: actions.SIGN_IN_FAILED,
-//           error: res.response.data.error
-//         });
-//       });
-//   };
-// };
+export const verify = () => {
+  let token = retrieveToken();
+  if (token) {
+    return dispatch => {
+      dispatch({ type: actions.VERIFY_TOKEN_IN_PROGRESS });
+      axios({
+        url: endpoints.VERIFY,
+        method: "POST",
+        headers: {
+          authorization: retrieveToken()
+        }
+      })
+        .then(res => {
+          dispatch({
+            type: actions.VERIFY_TOKEN_SUCCESSFUL,
+            data: res.data
+          });
+        })
+        .catch(res => {
+          dispatch({
+            type: actions.VERIFY_TOKEN_FAILED,
+            message: extractMessage(res)
+          });
+        });
+    };
+  } else {
+    return {
+      type: actions.VERIFY_TOKEN_FAILED
+    };
+  }
+};
 
 export const signup = obj => {
   return dispatch => {
     dispatch({ type: actions.SIGNUP_IN_PROGRESS });
     axios({
-      url: process.env.REACT_APP_SIGNUP,
+      url: endpoints.SIGNUP,
       method: "POST",
       data: obj
     })
       .then(res => {
-        setToken("jwtToken", res.data.jwtToken);
+        saveToken("ls", res.data.token);
         dispatch({
           type: actions.SIGNUP_SUCCESSFUL,
           data: res.data
@@ -70,15 +78,13 @@ export const signup = obj => {
       .catch(res => {
         dispatch({
           type: actions.SIGNUP_FAILED,
-          error: res.response.data.message
+          message: extractMessage(res)
         });
       });
   };
 };
 
 export const signout = () => {
-  return dispatch => {
-    clearToken();
-    dispatch({ type: actions.SIGNOUT });
-  };
+  clearToken();
+  return { type: actions.SIGNOUT };
 };
