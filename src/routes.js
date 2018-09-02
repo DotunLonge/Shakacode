@@ -1,42 +1,88 @@
 import React from "react";
 import { Switch, Route, BrowserRouter as Router } from "react-router-dom";
 import HomePage from "./pages/home";
-import ProtectedRoute from "./helpers/protected-route";
+import { AuthRoute, ProtectedRoute } from "./helpers/routes";
 import { connect } from "react-redux";
-import DashboardPage from "./pages/dashboard";
+import DashboardPage from "./pages/dashboards";
 import ErrorPage from "./pages/error-page";
 import LoginPage from "./pages/login";
 import SignupPage from "./pages/signup";
+import viewAll from "./pages/users/view-all";
+import prohibit from "./pages/HOCs/prohibit";
+import viewOne from "./pages/users/view-one";
+import loading from "./pages/HOCs/loading";
+import DeleteUser from "./pages/users/delete-user";
+import EditUser from "./pages/users/edit-user";
+import prohibitSelf from "./pages/HOCs/prohibit-self";
 
-const Routes = ({ role, isAuthenticated }) => {
+const Routes = ({ isAdmin, isAuthenticated, verifiedID }) => {
   return (
     <Router>
       <Switch>
         <Route component={HomePage} exact path="/" />
+
         <ProtectedRoute
           component={DashboardPage}
-          allowed="admin"
-          role={role}
           exact
           path="/dashboard"
           isAuthenticated={isAuthenticated}
         />
 
-        <ProtectedRoute
-          component={LoginPage}
-          role={role}
-          allowed="auth"
+        <AuthRoute
+          component={loading(
+            LoginPage,
+            isAuthenticated,
+            isAuthenticated !== "" && isAuthenticated
+          )}
           exact
           path="/signin"
           isAuthenticated={isAuthenticated}
         />
 
-        <ProtectedRoute
-          component={SignupPage}
-          role={role}
-          allowed="auth"
+        <AuthRoute
+          component={loading(
+            SignupPage,
+            isAuthenticated,
+            isAuthenticated !== "" && isAuthenticated
+          )}
           exact
           path="/signup"
+          isAuthenticated={isAuthenticated}
+        />
+
+        <ProtectedRoute
+          exact
+          path="/dashboard/users"
+          component={loading(prohibit(viewAll, isAdmin), isAuthenticated, true)}
+          isAuthenticated={isAuthenticated}
+        />
+
+        <ProtectedRoute
+          exact
+          path="/dashboard/users/:id"
+          component={loading(prohibit(viewOne, isAdmin), isAuthenticated, true)}
+          isAuthenticated={isAuthenticated}
+        />
+
+        <ProtectedRoute
+          exact
+          path="/dashboard/users/:id/edit"
+          component={loading(
+            prohibit(EditUser, isAdmin),
+            isAuthenticated,
+            true
+          )}
+          isAuthenticated={isAuthenticated}
+        />
+
+        <ProtectedRoute
+          exact
+          path="/dashboard/users/:id/delete"
+          component={loading(
+            prohibitSelf(prohibit(DeleteUser, isAdmin), verifiedID),
+            isAuthenticated,
+            true
+          )}
           isAuthenticated={isAuthenticated}
         />
 
@@ -48,7 +94,8 @@ const Routes = ({ role, isAuthenticated }) => {
 
 const mapStateToProps = state => {
   return {
-    role: state.auth.data.role,
+    isAdmin: state.auth.data.isAdmin,
+    verifiedID: state.auth.data.id,
     isAuthenticated: state.auth.isAuthenticated
   };
 };

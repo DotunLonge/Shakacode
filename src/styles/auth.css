@@ -6,6 +6,17 @@ form {
 .auth .form-group {
   padding: 12px 0;
 }
+
+button {
+  outline: none;
+  border: 0;
+}
+
+button:disabled {
+  background: #bbb !important;
+  cursor: not-allowed !important;
+}
+
 .auth input,
 .auth #role,
 .auth #submit {

@@ -1,3 +1,17 @@
 .home {
   text-align: center;
 }
+
+table {
+  text-align: left;
+  margin: auto;
+}
+
+table th,
+table td {
+  padding: 0 1em;
+}
+
+table tr td a {
+  padding-right: 1em;
+}

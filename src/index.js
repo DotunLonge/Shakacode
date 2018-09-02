@@ -6,6 +6,9 @@ import registerServiceWorker from "./registerServiceWorker";
 
 import store from "./redux-store";
 import { Provider } from "react-redux";
+import { verify } from "./redux-store/action-creators/auth";
+
+store.dispatch(verify());
 
 ReactDOM.render(
   <Provider store={store}>
