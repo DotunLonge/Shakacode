@@ -7,7 +7,9 @@ var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var cors = require("cors");
 var logger = require("morgan");
-var port = process.env.PORT || 4000;
+var port = process.env.PORT || 7070;
+
+var { pageNotFound, generalError } = require("./routes/middleware");
 
 var app = express();
 
@@ -53,18 +55,9 @@ connectWithRetry();
 require("./routes")(app);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error("File Not Found");
-  err.status = 404;
-  next(err);
-});
-
+app.use(pageNotFound);
 // error handler
-// define as the last app.use callback
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.send(err.message);
-});
+app.use(generalError);
 
 // 8. Start the servers
 http.listen(port, function() {
